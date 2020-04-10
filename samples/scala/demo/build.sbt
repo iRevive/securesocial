@@ -2,8 +2,6 @@ import PlayKeys._
 
 name    := "scala-demo"
 
-version := Common.version
-
 scalaVersion := Common.scalaVersion
 
 crossScalaVersions := Common.crossScalaVersions

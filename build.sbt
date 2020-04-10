@@ -1,7 +1,5 @@
 name := "SecureSocial-parent"
 
-version := Common.version
-
 scalaVersion := Common.scalaVersion
 crossScalaVersions := Common.crossScalaVersions
 
@@ -11,6 +9,15 @@ lazy val scalaDemo = project.in( file("samples/scala/demo") ).enablePlugins(Play
 
 lazy val javaDemo = project.in( file("samples/java/demo") ).enablePlugins(PlayJava).dependsOn(core)
 
-lazy val root = project.in( file(".") ).aggregate(core, scalaDemo, javaDemo) .settings(
+lazy val root = project.in( file(".") ).aggregate(core) .settings(
      aggregate in update := false
    )
+
+inThisBuild(
+  Seq(
+    organization := "io.github.irevive",
+    homepage     := Some(url("https://github.com/iRevive/securesocial")),
+    licenses     := List("The Apache Software License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.txt")),
+    developers   := List(Developer("jaliss", "Jorge Aliss", "", url("https://twitter.com/jaliss")))
+  )
+)
