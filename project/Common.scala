@@ -1,7 +1,7 @@
 
 
 object Common {
-  def playVersion = System.getProperty("play.version", "2.6.12")
-  def scalaVersion = System.getProperty("scala.version", "2.12.11")
-  def crossScalaVersions = Seq(scalaVersion, "2.11.12")
+  def playVersion = System.getProperty("play.version", "2.8.7")
+  def scalaVersion = System.getProperty("scala.version", "2.12.12")
+  def crossScalaVersions = Seq(scalaVersion, "2.13.4")
 }

@@ -96,20 +96,6 @@ case class CookieAuthenticator[U](
     }
   }
 
-  /**
-   * Removes the authenticator from the store and discards the cookie associated with it.
-   *
-   * @param javaContext the current invocation context
-   */
-  override def discarding(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    store.delete(id).map { _ =>
-      javaContext.response().discardCookie(
-        config.name,
-        config.path,
-        config.domain.orNull,
-        config.secure)
-    }
-  }
 }
 
 /**

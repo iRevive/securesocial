@@ -124,16 +124,6 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
   }
 
   /**
-   * Adds a touched authenticator to the result(for Java).  In this implementation there's no need
-   * to do anything with the result
-   *
-   * @param javaContext the current invocation context
-   */
-  def touching(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    Future.successful(())
-  }
-
-  /**
    * Ends an authenticator session.  This is invoked when the user logs out or if the
    * authenticator becomes invalid (maybe due to a timeout)
    *
@@ -144,13 +134,4 @@ trait StoreBackedAuthenticator[U, T <: Authenticator[U]] extends Authenticator[U
     store.delete(id).map { _ => result }
   }
 
-  /**
-   * Ends an authenticator session.  This is invoked when the authenticator becomes invalid (for Java actions)
-   *
-   * @param javaContext the current http context
-   * @return the current http context modified to signal the authenticator is no longer valid
-   */
-  override def discarding(javaContext: play.mvc.Http.Context): Future[Unit] = {
-    store.delete(id).map { _ => () }
-  }
 }

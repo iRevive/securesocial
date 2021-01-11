@@ -1,7 +1,7 @@
 @(providerId: String, loginForm: Option[Form[(String, String)]] = None)(implicit request: RequestHeader, messages: Messages, env: securesocial.core.RuntimeEnvironment)
 
 @import securesocial.core.AuthenticationMethod._
-@import play.api.Logger
+@import org.slf4j.LoggerFactory
 @import helper._
 
 @implicitFieldConstructor = @{ FieldConstructor(securesocial.views.html.inputFieldConstructor.f) }
@@ -57,6 +57,6 @@
     @*****************************************
      * Todo: throw a runtime exception? this might need improvement
      *****************************************@
-    @Logger.error("[securesocial] unknown provider '%s'. Can't render it.".format(providerId))
+    @LoggerFactory.getLogger(this.getClass).error("[securesocial] unknown provider '%s'. Can't render it.".format(providerId))
     { throw new RuntimeException("Unknown provider '%s') }
 }

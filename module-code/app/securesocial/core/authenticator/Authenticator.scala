@@ -103,24 +103,6 @@ trait Authenticator[U] {
    */
   def touching(result: Result): Future[Result]
 
-  // java results
-  /**
-   * Invoked after a protected Java action is executed.  This can be used to
-   * alter the result in implementations that need to update the information sent to the client
-   * after the authenticator is used.
-   *
-   * @param javaContext the current http context
-   * @return the http context modified with the updated authenticator
-   */
-  def touching(javaContext: play.mvc.Http.Context): Future[Unit]
-
-  /**
-   * Ends an authenticator session.  This is invoked when the authenticator becomes invalid (for Java actions)
-   *
-   * @param javaContext the current http context
-   * @return the current http context modified to signal the authenticator is no longer valid
-   */
-  def discarding(javaContext: play.mvc.Http.Context): Future[Unit]
 }
 
 /**

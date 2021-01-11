@@ -18,7 +18,7 @@ package securesocial.core.providers
 
 import io.methvin.play.autoconfig.AutoConfig
 import org.joda.time.DateTime
-import play.api.data.Form
+import play.api.data.{ Form, FormBinding }
 import play.api.data.Forms._
 import play.api.i18n.{ I18nSupport, MessagesApi }
 import play.api.mvc._
@@ -86,7 +86,7 @@ class UsernamePasswordProvider[U](
   }
 
   private def doAuthentication[A](apiMode: Boolean = false)(implicit request: Request[A]): Future[AuthenticationResult] = {
-    val form = UsernamePasswordProvider.loginForm.bindFromRequest()
+    val form = UsernamePasswordProvider.loginForm.bindFromRequest()(request, FormBinding.Implicits.formBinding)
     form.fold(
       errors => Future.successful {
         if (apiMode)
