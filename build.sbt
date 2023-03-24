@@ -3,13 +3,11 @@ import play.sbt.PlayImport.PlayKeys._
 name := "SecureSocial-parent"
 
 scalaVersion := Common.scalaVersion
-crossScalaVersions := Common.crossScalaVersions
 
 lazy val core =  project.in( file("module-code") ).enablePlugins(PlayScala)
   .settings(
     name := "securesocial",
     scalaVersion := Common.scalaVersion,
-    crossScalaVersions := Common.crossScalaVersions,
 
     libraryDependencies ++= Seq(
       ws,
