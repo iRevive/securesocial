@@ -16,8 +16,9 @@
  */
 package securesocial.core.authenticator
 
+import java.time.LocalDateTime
+
 import io.methvin.play.autoconfig.AutoConfig
-import org.joda.time.DateTime
 import play.api.{ ConfigLoader, Configuration }
 import play.api.mvc.{ Cookie, DiscardingCookie, RequestHeader, Result }
 
@@ -42,9 +43,9 @@ import scala.concurrent.Future
 case class CookieAuthenticator[U](
   id: String,
   user: U,
-  expirationDate: DateTime,
-  lastUsed: DateTime,
-  creationDate: DateTime,
+  expirationDate: LocalDateTime,
+  lastUsed: LocalDateTime,
+  creationDate: LocalDateTime,
   config: CookieConfig,
   @transient store: AuthenticatorStore[CookieAuthenticator[U]])
   extends StoreBackedAuthenticator[U, CookieAuthenticator[U]] {
@@ -61,7 +62,7 @@ case class CookieAuthenticator[U](
    * @param time the new time
    * @return the modified authenticator
    */
-  def withLastUsedTime(time: DateTime): CookieAuthenticator[U] = this.copy[U](lastUsed = time)
+  def withLastUsedTime(time: LocalDateTime): CookieAuthenticator[U] = this.copy[U](lastUsed = time)
 
   /**
    * Returns a copy of this Authenticator with the given user
@@ -136,7 +137,7 @@ class CookieAuthenticatorBuilder[U](
   override def fromUser(user: U): Future[CookieAuthenticator[U]] = {
     generator.generate.flatMap {
       id =>
-        val now = DateTime.now()
+        val now = LocalDateTime.now()
         val expirationDate = now.plusMinutes(config.absoluteTimeoutInMinutes)
         val authenticator = CookieAuthenticator(id, user, expirationDate, now, now, config, store)
         store.save(authenticator, config.absoluteTimeoutInSeconds)

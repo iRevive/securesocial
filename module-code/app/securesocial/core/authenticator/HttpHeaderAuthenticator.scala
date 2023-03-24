@@ -16,8 +16,9 @@
  */
 package securesocial.core.authenticator
 
+import java.time.LocalDateTime
+
 import io.methvin.play.autoconfig.AutoConfig
-import org.joda.time.DateTime
 import play.api.mvc.{ Result, _ }
 import play.api.{ ConfigLoader, Configuration }
 
@@ -39,9 +40,9 @@ import scala.concurrent.Future
  * @see AuthenticatorStore
  * @see RuntimeEnvironment
  */
-case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateTime,
-  lastUsed: DateTime,
-  creationDate: DateTime,
+case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: LocalDateTime,
+  lastUsed: LocalDateTime,
+  creationDate: LocalDateTime,
   config: HttpHeaderConfig,
   @transient store: AuthenticatorStore[HttpHeaderAuthenticator[U]])
   extends StoreBackedAuthenticator[U, HttpHeaderAuthenticator[U]] {
@@ -54,7 +55,7 @@ case class HttpHeaderAuthenticator[U](id: String, user: U, expirationDate: DateT
    * @param time the new time
    * @return the modified authenticator
    */
-  def withLastUsedTime(time: DateTime): HttpHeaderAuthenticator[U] = this.copy[U](lastUsed = time)
+  def withLastUsedTime(time: LocalDateTime): HttpHeaderAuthenticator[U] = this.copy[U](lastUsed = time)
 
   /**
    * Returns a copy of this Authenticator with the given user
@@ -116,7 +117,7 @@ class HttpHeaderAuthenticatorBuilder[U](
   override def fromUser(user: U): Future[HttpHeaderAuthenticator[U]] = {
     generator.generate.flatMap {
       id =>
-        val now = DateTime.now()
+        val now = LocalDateTime.now()
         val expirationDate = now.plusMinutes(config.absoluteTimeoutInMinutes)
         val authenticator = HttpHeaderAuthenticator(id, user, expirationDate, now, now, config, store)
         store.save(authenticator, config.absoluteTimeoutInSeconds)

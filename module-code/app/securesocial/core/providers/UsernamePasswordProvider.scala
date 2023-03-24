@@ -16,8 +16,9 @@
  */
 package securesocial.core.providers
 
+import java.time.LocalDateTime
+
 import io.methvin.play.autoconfig.AutoConfig
-import org.joda.time.DateTime
 import play.api.data.{ Form, FormBinding }
 import play.api.data.Forms._
 import play.api.i18n.{ I18nSupport, MessagesApi }
@@ -141,6 +142,6 @@ object UsernamePasswordProvider {
  * @param expirationTime the expiration time
  * @param isSignUp a boolean indicating wether the token was created for a sign up action or not
  */
-case class MailToken(uuid: String, email: String, creationTime: DateTime, expirationTime: DateTime, isSignUp: Boolean) {
-  def isExpired = expirationTime.isBeforeNow
+case class MailToken(uuid: String, email: String, creationTime: LocalDateTime, expirationTime: LocalDateTime, isSignUp: Boolean) {
+  def isExpired = expirationTime.isBefore(LocalDateTime.now)
 }

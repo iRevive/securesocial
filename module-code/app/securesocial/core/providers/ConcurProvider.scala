@@ -16,8 +16,10 @@
  */
 package securesocial.core.providers
 
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.{ DateTime, Seconds }
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+
 import play.api.http.HeaderNames
 import play.api.libs.ws.WSResponse
 import play.api.mvc.Request
@@ -46,7 +48,7 @@ class ConcurProvider(
   client: OAuth2Client)
   extends OAuth2Provider(routesService, client, cacheService) {
   /** formatter used to parse the expiration date returned from Concur */
-  private val ExpirationDateFormatter = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss a")
+  private val ExpirationDateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm:ss a")
 
   override val id = ConcurProvider.Concur
 
@@ -78,14 +80,14 @@ class ConcurProvider(
       (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.Token).headOption.map(_.text).getOrElse(""),
       (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.TokenType).headOption.map(_.text),
       (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.ExpirationDate).headOption.map(v => {
-        Seconds.secondsBetween(DateTime.now(), ExpirationDateFormatter.parseDateTime(v.text)).getSeconds
+        ChronoUnit.SECONDS.between(LocalDateTime.now, LocalDateTime.parse(v.text, ExpirationDateFormatter)).toInt
       }),
       (xml \\ ConcurProvider.AccessToken \\ ConcurProvider.RefreshToken).headOption.map(_.text))
   }
 
   override def fillProfile(info: OAuth2Info): Future[BasicProfile] = {
     val accessToken = info.accessToken
-    client.httpService.url(ConcurProvider.UserProfileApi).withHeaders(
+    client.httpService.url(ConcurProvider.UserProfileApi).withHttpHeaders(
       HeaderNames.AUTHORIZATION -> "OAuth %s".format(accessToken),
       HeaderNames.CONTENT_TYPE -> "application/xml").get().map { response =>
         val xml = response.xml

@@ -124,7 +124,7 @@ object RoutesService {
     }
 
     override def loginPageUrl(implicit req: RequestHeader): String = {
-      absoluteUrl(securesocial.controllers.routes.LoginPage.login())
+      absoluteUrl(securesocial.controllers.routes.LoginPage.login)
     }
 
     override def accessDeniedUrl(implicit req: RequestHeader): String = {
@@ -132,11 +132,11 @@ object RoutesService {
     }
 
     override def startSignUpUrl(implicit req: RequestHeader): String = {
-      absoluteUrl(securesocial.controllers.routes.Registration.startSignUp())
+      absoluteUrl(securesocial.controllers.routes.Registration.startSignUp)
     }
 
     override def handleStartSignUpUrl(implicit req: RequestHeader): String = {
-      absoluteUrl(securesocial.controllers.routes.Registration.handleStartSignUp())
+      absoluteUrl(securesocial.controllers.routes.Registration.handleStartSignUp)
     }
 
     override def signUpUrl(mailToken: String)(implicit req: RequestHeader): String = {
@@ -148,11 +148,11 @@ object RoutesService {
     }
 
     override def startResetPasswordUrl(implicit request: RequestHeader): String = {
-      absoluteUrl(securesocial.controllers.routes.PasswordReset.startResetPassword())
+      absoluteUrl(securesocial.controllers.routes.PasswordReset.startResetPassword)
     }
 
     override def handleStartResetPasswordUrl(implicit req: RequestHeader): String = {
-      absoluteUrl(securesocial.controllers.routes.PasswordReset.handleStartResetPassword())
+      absoluteUrl(securesocial.controllers.routes.PasswordReset.handleStartResetPassword)
     }
 
     override def resetPasswordUrl(mailToken: String)(implicit req: RequestHeader): String = {
@@ -164,7 +164,7 @@ object RoutesService {
     }
 
     override def passwordChangeUrl(implicit req: RequestHeader): String = {
-      absoluteUrl(securesocial.controllers.routes.PasswordChange.page())
+      absoluteUrl(securesocial.controllers.routes.PasswordChange.page)
     }
 
     override def handlePasswordChangeUrl(implicit req: RequestHeader): String = {

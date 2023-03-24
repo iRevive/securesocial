@@ -29,7 +29,7 @@ object utils {
    * Helper methods for SimpleResult
    * @param r a SimpleResult instance
    */
-  implicit class SimpleResultMethods(val r: Result) {
+  implicit class SimpleResultMethods(private val r: Result) extends AnyVal {
     def startingAuthenticator[A](authenticator: Authenticator[A]) = authenticator.starting(r)
     def discardingAuthenticator[A](authenticator: Authenticator[A]) = authenticator.discarding(r)
     def touchingAuthenticator[A](authenticator: Authenticator[A]) = authenticator.touching(r)
