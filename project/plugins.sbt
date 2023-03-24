@@ -12,7 +12,7 @@ addSbtPlugin("org.scalariform" % "sbt-scalariform" % "1.8.2")
 
 // PGP signing
 
-addSbtPlugin("com.geirsson" % "sbt-ci-release" % "1.5.2")
+addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.11")
 
 addDependencyTreePlugin
 
