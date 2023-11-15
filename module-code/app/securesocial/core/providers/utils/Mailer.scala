@@ -30,13 +30,13 @@ import scala.concurrent.ExecutionContext
  * A helper trait to send email notifications
  */
 trait Mailer {
-  def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages)
-  def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, messages: Messages)
-  def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages)
-  def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, messages: Messages)
-  def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, messages: Messages)
-  def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, messages: Messages)
-  def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html]))
+  def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages): Unit
+  def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, messages: Messages): Unit
+  def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages): Unit
+  def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, messages: Messages): Unit
+  def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, messages: Messages): Unit
+  def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, messages: Messages): Unit
+  def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html])): Unit
 }
 
 object Mailer {
@@ -60,39 +60,39 @@ object Mailer {
     val UnknownEmailNoticeSubject = "mails.unknownEmail.subject"
     val PasswordResetOkSubject = "mails.passwordResetOk.subject"
 
-    override def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages) {
+    override def sendAlreadyRegisteredEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages): Unit = {
       val txtAndHtml = mailTemplates.getAlreadyRegisteredEmail(user)
       sendEmail(Messages(AlreadyRegisteredSubject), user.email.get, txtAndHtml)
 
     }
 
-    override def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, messages: Messages) {
+    override def sendSignUpEmail(to: String, token: String)(implicit request: RequestHeader, messages: Messages): Unit = {
       val txtAndHtml = mailTemplates.getSignUpEmail(token)
       sendEmail(Messages(SignUpEmailSubject), to, txtAndHtml)
     }
 
-    override def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages) {
+    override def sendWelcomeEmail(user: BasicProfile)(implicit request: RequestHeader, messages: Messages): Unit = {
       val txtAndHtml = mailTemplates.getWelcomeEmail(user)
       sendEmail(Messages(WelcomeEmailSubject), user.email.get, txtAndHtml)
 
     }
 
-    override def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, messages: Messages) {
+    override def sendPasswordResetEmail(user: BasicProfile, token: String)(implicit request: RequestHeader, messages: Messages): Unit = {
       val txtAndHtml = mailTemplates.getSendPasswordResetEmail(user, token)
       sendEmail(Messages(PasswordResetSubject), user.email.get, txtAndHtml)
     }
 
-    override def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, messages: Messages) {
+    override def sendUnkownEmailNotice(email: String)(implicit request: RequestHeader, messages: Messages): Unit = {
       val txtAndHtml = mailTemplates.getUnknownEmailNotice()
       sendEmail(Messages(UnknownEmailNoticeSubject), email, txtAndHtml)
     }
 
-    override def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, messages: Messages) {
+    override def sendPasswordChangedNotice(user: BasicProfile)(implicit request: RequestHeader, messages: Messages): Unit = {
       val txtAndHtml = mailTemplates.getPasswordChangedNoticeEmail(user)
       sendEmail(Messages(PasswordResetOkSubject), user.email.get, txtAndHtml)
     }
 
-    override def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html])) {
+    override def sendEmail(subject: String, recipient: String, body: (Option[Txt], Option[Html])): Unit = {
       import scala.concurrent.duration._
 
       logger.debug(s"[securesocial] sending email to $recipient")

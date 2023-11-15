@@ -14,8 +14,8 @@ lazy val core =  project.in( file("module-code") ).enablePlugins(PlayScala)
       filters,
       specs2 % "test",
       cacheApi,
-      "org.apache.commons" % "commons-lang3" % "3.11",
-      "com.typesafe.play" %% "play-mailer-guice" % "8.0.1", // this could be play-mailer but wouldn't have the guice module
+      "org.apache.commons" % "commons-lang3" % "3.13.0",
+      "org.playframework" %% "play-mailer-guice" % "10.0.0", // this could be play-mailer but wouldn't have the guice module
       "io.methvin.play" %% "autoconfig-macros" % "0.3.2" % "provided",
       "org.mindrot" % "jbcrypt" % "0.4"
     ),
