@@ -19,7 +19,7 @@ package service
 
 import javax.inject.{ Inject, Singleton }
 
-import akka.actor.ActorSystem
+import org.apache.pekko.ActorSystem
 import controllers.CustomRoutesService
 import play.api.cache.AsyncCacheApi
 import play.api.{ Configuration, Environment }

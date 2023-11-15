@@ -18,7 +18,7 @@ package securesocial.core.authenticator
 
 import java.time.LocalDateTime
 
-import io.methvin.play.autoconfig.AutoConfig
+import com.typesafe.config.Config
 import play.api.mvc.{ Result, _ }
 import play.api.{ ConfigLoader, Configuration }
 
@@ -132,7 +132,16 @@ case class HttpHeaderConfig(
   def absoluteTimeoutInSeconds: Int = absoluteTimeoutInMinutes * 60
 }
 object HttpHeaderConfig {
-  implicit val configLoader: ConfigLoader[HttpHeaderConfig] = AutoConfig.loader
+  implicit val configLoader: ConfigLoader[HttpHeaderConfig] =
+    (config: Config, path: String) => {
+      val conf = if (path.isEmpty) config else config.getConfig(path)
+
+      HttpHeaderConfig(
+        conf.getString("name"),
+        conf.getInt("idleTimeoutInMinutes"),
+        conf.getInt("absoluteTimeoutInMinutes")
+      )
+    }
 
   def fromConfiguration(configuration: Configuration): HttpHeaderConfig =
     configuration.get[HttpHeaderConfig]("securesocial.auth-header")

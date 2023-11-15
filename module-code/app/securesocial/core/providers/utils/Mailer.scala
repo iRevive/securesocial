@@ -16,7 +16,7 @@
  */
 package securesocial.core.providers.utils
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import play.api.Configuration
 import play.api.i18n.Messages
 import play.api.mvc.RequestHeader

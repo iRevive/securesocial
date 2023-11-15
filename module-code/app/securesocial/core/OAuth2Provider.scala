@@ -19,8 +19,8 @@ package securesocial.core
 import _root_.java.net.URLEncoder
 import _root_.java.util.UUID
 
+import com.typesafe.config.Config
 import com.typesafe.config.ConfigObject
-import io.methvin.play.autoconfig.AutoConfig
 import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
 import play.api.libs.ws.WSResponse
 import play.api.mvc._
@@ -229,7 +229,20 @@ case class OAuth2Settings(
 
 object OAuth2Settings {
 
-  implicit val configLoader: ConfigLoader[OAuth2Settings] = AutoConfig.loader
+  implicit val configLoader: ConfigLoader[OAuth2Settings] =
+    (config: Config, path: String) => {
+      val conf = if (path.isEmpty) config else config.getConfig(path)
+
+      OAuth2Settings(
+        conf.getString("authorizationUrl"),
+        conf.getString("accessTokenUrl"),
+        conf.getString("clientId"),
+        conf.getString("clientSecret"),
+        Option.when(conf.hasPath("scope") && !config.getIsNull(path))(conf.getString("scope")),
+        implicitly[ConfigLoader[Map[String, String]]].load(conf, "authorizationUrlParams"),
+        implicitly[ConfigLoader[Map[String, String]]].load(conf, "accessTokenUrlParams")
+      )
+    }
 
   /**
    * Helper method to create an OAuth2Settings instance from the properties file.

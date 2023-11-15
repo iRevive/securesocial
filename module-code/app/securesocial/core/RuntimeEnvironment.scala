@@ -1,6 +1,6 @@
 package securesocial.core
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import play.api.{ Configuration, Environment }
 import play.api.cache.AsyncCacheApi
 import play.api.i18n.MessagesApi

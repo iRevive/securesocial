@@ -18,7 +18,7 @@ package securesocial.core.providers
 
 import java.time.LocalDateTime
 
-import io.methvin.play.autoconfig.AutoConfig
+import com.typesafe.config.Config
 import play.api.data.{ Form, FormBinding }
 import play.api.data.Forms._
 import play.api.i18n.{ I18nSupport, MessagesApi }
@@ -119,7 +119,20 @@ case class UsernamePasswordConfig(
   signupSkipLogin: Boolean,
   minimumPasswordLength: Int)
 object UsernamePasswordConfig {
-  implicit val configLoader: ConfigLoader[UsernamePasswordConfig] = AutoConfig.loader
+  implicit val configLoader: ConfigLoader[UsernamePasswordConfig] =
+    (config: Config, path: String) => {
+      val conf = if (path.isEmpty) config else config.getConfig(path)
+
+      UsernamePasswordConfig(
+        conf.getBoolean("withUserNameSupport"),
+        conf.getBoolean("sendWelcomeEmail"),
+        conf.getString("hasher"),
+        conf.getBoolean("enableTokenJob"),
+        conf.getBoolean("signupSkipLogin"),
+        conf.getInt("minimumPasswordLength")
+      )
+    }
+
   def fromConfiguration(configuration: Configuration): UsernamePasswordConfig =
     configuration.get[UsernamePasswordConfig]("securesocial.userpass")
 }
