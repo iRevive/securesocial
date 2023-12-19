@@ -18,7 +18,7 @@ package securesocial.core.authenticator
 
 import java.time.LocalDateTime
 
-import io.methvin.play.autoconfig.AutoConfig
+import com.typesafe.config.Config
 import play.api.{ ConfigLoader, Configuration }
 import play.api.mvc.{ Cookie, DiscardingCookie, RequestHeader, Result }
 
@@ -171,7 +171,23 @@ case class CookieConfig(
     DiscardingCookie(name, path, domain, secure)
 }
 object CookieConfig {
-  implicit val configLoader: ConfigLoader[CookieConfig] = AutoConfig.loader
+  implicit val configLoader: ConfigLoader[CookieConfig] =
+    (config: Config, path: String) => {
+      val conf = if (path.isEmpty) config else config.getConfig(path)
+
+      CookieConfig(
+        conf.getString("name"),
+        conf.getString("path"),
+        Option.when(conf.hasPath("domain") && !conf.getIsNull("domain"))(conf.getString("domain")),
+        conf.getBoolean("secure"),
+        conf.getBoolean("httpOnly"),
+        conf.getInt("idleTimeoutInMinutes"),
+        conf.getInt("absoluteTimeoutInMinutes"),
+        conf.getBoolean("makeTransient"),
+        Option.when(conf.hasPath("sameSite") && !conf.getIsNull("sameSite"))(conf.getString("sameSite"))
+          .orElse(Some(Cookie.SameSite.Lax.value)))
+    }
+
   def fromConfiguration(configuration: Configuration): CookieConfig =
     configuration.get[CookieConfig]("securesocial.cookie")
 }

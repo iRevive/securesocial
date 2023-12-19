@@ -18,8 +18,8 @@ package securesocial.core
 
 import _root_.java.util.UUID
 
+import com.typesafe.config.Config
 import com.typesafe.config.ConfigObject
-import io.methvin.play.autoconfig.AutoConfig
 import play.api.libs.json.JsValue
 import play.api.libs.oauth.{ ConsumerKey, OAuth, RequestToken, ServiceInfo, _ }
 import play.api.mvc.Results.Redirect
@@ -82,7 +82,18 @@ case class OAuth1Settings(
   consumerKey: String,
   consumerSecret: String)
 object OAuth1Settings {
-  implicit val configLoader: ConfigLoader[OAuth1Settings] = AutoConfig.loader
+  implicit val configLoader: ConfigLoader[OAuth1Settings] =
+    (config: Config, path: String) => {
+      val conf = if (path.isEmpty) config else config.getConfig(path)
+
+      OAuth1Settings(
+        conf.getString("requestTokenUrl"),
+        conf.getString("accessTokenUrl"),
+        conf.getString("authorizationUrl"),
+        conf.getString("consumerKey"),
+        conf.getString("consumerSecret"))
+    }
+
   def forProvider(configuration: Configuration, id: String): OAuth1Settings = {
     val path = s"securesocial.$id"
     val defaultPath = "securesocial.oauth1Settings"

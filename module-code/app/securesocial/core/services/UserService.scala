@@ -106,14 +106,6 @@ trait UserService[U] {
    */
   def deleteToken(uuid: String): Future[Option[MailToken]]
 
-  /**
-   * Deletes all expired tokens
-   *
-   * Note: If you do not plan to use the UsernamePassword provider just provide en empty
-   * implementation
-   *
-   */
-  def deleteExpiredTokens()
 }
 
 /**
