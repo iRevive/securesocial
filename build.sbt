@@ -1,5 +1,3 @@
-import play.sbt.PlayImport.PlayKeys._
-
 name := "SecureSocial-parent"
 
 scalaVersion := Common.scalaVersion
@@ -14,7 +12,7 @@ lazy val core =  project.in( file("module-code") ).enablePlugins(PlayScala)
       filters,
       specs2 % "test",
       cacheApi,
-      "org.apache.commons" % "commons-lang3" % "3.13.0",
+      "org.apache.commons" % "commons-lang3" % "3.14.0",
       "org.playframework" %% "play-mailer-guice" % "10.0.0", // this could be play-mailer but wouldn't have the guice module
       "org.mindrot" % "jbcrypt" % "0.4"
     ),
@@ -36,7 +34,7 @@ lazy val scalaDemo = project.in( file("samples/scala/demo") ).enablePlugins(Play
 lazy val javaDemo = project.in( file("samples/java/demo") ).enablePlugins(PlayJava).dependsOn(core)*/
 
 lazy val root = project.in( file(".") ).aggregate(core) .settings(
-     aggregate in update := false
+     update / aggregate := false
    )
 
 inThisBuild(

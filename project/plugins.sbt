@@ -5,7 +5,7 @@ logLevel := Level.Warn
 resolvers += Resolver.typesafeRepo("releases")
 
 // Use the Play sbt plugin for Play projects
-addSbtPlugin("org.playframework" % "sbt-plugin" % System.getProperty("play.version", "3.0.0"))
+addSbtPlugin("org.playframework" % "sbt-plugin" % System.getProperty("play.version", "3.0.4"))
 
 // PGP signing
 
