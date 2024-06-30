@@ -18,13 +18,15 @@ package securesocial.core
 
 import play.api.mvc.{ Session, RequestHeader }
 
+import scala.concurrent.{ExecutionContext, Future}
+
 /**
  * A trait to model SecureSocial events
  */
 abstract class Event[U](val user: U)
 
 object Event {
-  def unapply[U](event: Event[U]) = Some(event.user)
+  def unapply[U](event: Event[U]): Option[U] = Some(event.user)
 }
 
 /**
@@ -70,7 +72,7 @@ abstract class EventListener {
    * @param session the current session (if you need to manipulate it don't use the one in request.session)
    * @return can return an optional Session object.
    */
-  def onEvent[U](event: Event[U], request: RequestHeader, session: Session): Option[Session]
+  def onEvent[U](event: Event[U], request: RequestHeader, session: Session): Future[Option[Session]]
 }
 
 /**
@@ -78,19 +80,27 @@ abstract class EventListener {
  */
 object Events {
 
-  def doFire[U](list: Seq[EventListener], event: Event[U],
-    request: RequestHeader, session: Session): Session =
-    {
-      if (list.isEmpty) {
-        session
-      } else {
-        val newSession = list.head.onEvent(event, request, session)
-        doFire(list.tail, event, request, newSession.getOrElse(session))
-      }
+  def doFire[U](
+    list: List[EventListener],
+    event: Event[U],
+    request: RequestHeader,
+    session: Session
+  )(implicit ec: ExecutionContext): Future[Session] =
+    list match {
+      case head :: tail =>
+        for {
+          newSession <- head.onEvent(event, request, session)
+          result <- doFire(tail, event, request, newSession.getOrElse(session))
+        } yield result
+
+      case Nil =>
+        Future.successful(session)
     }
 
-  def fire[U](event: Event[U])(implicit request: RequestHeader, env: RuntimeEnvironment): Option[Session] = {
-    val result = doFire(env.eventListeners, event, request, request.session)
-    if (result == request.session) None else Some(result)
+  def fire[U](event: Event[U])(implicit request: RequestHeader, env: RuntimeEnvironment): Future[Option[Session]] = {
+    import env.executionContext
+    for {
+      result <- doFire(env.eventListeners.toList, event, request, request.session)
+    } yield Option.when(result != request.session)(result)
   }
 }

@@ -190,21 +190,25 @@ trait BaseRegistration extends MailTokenBasedOperations with BaseController {
                 ) yield {
                   if (env.usernamePasswordConfig.sendWelcomeEmail)
                     env.mailer.sendWelcomeEmail(newUser)
-                  val eventSession = Events.fire(new SignUpEvent(saved)).getOrElse(request.session)
+                  val eventSession = Events.fire(SignUpEvent(saved)).map(_.getOrElse(request.session))
                   if (env.usernamePasswordConfig.signupSkipLogin) {
                     env.authenticatorService.find(CookieAuthenticator.Id).map {
                       _.fromUser(saved).flatMap { authenticator =>
-                        confirmationResult()
-                          .flashing(Success -> Messages(SignUpDone))
-                          .withSession(eventSession - SecureSocial.OriginalUrlKey - IdentityProvider.SessionId)
-                          .startingAuthenticator(authenticator)
+                        eventSession.flatMap { evtSession =>
+                          confirmationResult()
+                            .flashing(Success -> Messages(SignUpDone))
+                            .withSession(evtSession - SecureSocial.OriginalUrlKey - IdentityProvider.SessionId)
+                            .startingAuthenticator(authenticator)
+                        }
                       }
                     } getOrElse {
                       logger.error("[securesocial] There isn't CookieAuthenticator registered in the RuntimeEnvironment")
                       Future.successful(confirmationResult().flashing(Error -> Messages("There was an error signing you up")))
                     }
                   } else {
-                    Future.successful(confirmationResult().flashing(Success -> Messages(SignUpDone)).withSession(eventSession))
+                    eventSession.flatMap { evtSession =>
+                      Future.successful(confirmationResult().flashing(Success -> Messages(SignUpDone)).withSession(evtSession))
+                    }
                   }
                 }
                 result.flatMap(f => f)

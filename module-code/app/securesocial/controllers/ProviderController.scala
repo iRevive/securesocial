@@ -113,13 +113,14 @@ trait BaseProviderController extends SecureSocial with I18nSupport {
               val mode = if (maybeExisting.isDefined) SaveMode.LoggedIn else SaveMode.SignUp
               env.userService.save(authenticated.profile, mode).flatMap { userForAction =>
                 logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
-                val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
-                val sessionAfterEvents = Events.fire(evt).getOrElse(request.session)
-                builder().fromUser(userForAction).flatMap { authenticator =>
-                  Redirect(toUrl(sessionAfterEvents, configuration)).withSession(sessionAfterEvents -
-                    SecureSocial.OriginalUrlKey -
-                    IdentityProvider.SessionId -
-                    OAuth1Provider.CacheKey).startingAuthenticator(authenticator)
+                val evt = if (mode == SaveMode.LoggedIn) LoginEvent(userForAction) else SignUpEvent(userForAction)
+                Events.fire(evt).map(_.getOrElse(request.session)).flatMap { sessionAfterEvents =>
+                  builder().fromUser(userForAction).flatMap { authenticator =>
+                    Redirect(toUrl(sessionAfterEvents, configuration)).withSession(sessionAfterEvents -
+                      SecureSocial.OriginalUrlKey -
+                      IdentityProvider.SessionId -
+                      OAuth1Provider.CacheKey).startingAuthenticator(authenticator)
+                  }
                 }
               }
             }

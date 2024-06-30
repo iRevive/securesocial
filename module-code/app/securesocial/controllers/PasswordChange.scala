@@ -132,13 +132,18 @@ trait BasePasswordChange extends SecureSocial with I18nSupport {
           errors => Future.successful(BadRequest(env.viewTemplates.getPasswordChangePage(errors))),
           info => {
             val newPasswordInfo = env.currentHasher.hash(info.newPassword)
-            env.userService.updatePasswordInfo(request.user, newPasswordInfo).map {
+            env.userService.updatePasswordInfo(request.user, newPasswordInfo).flatMap {
               case Some(u) =>
                 env.mailer.sendPasswordChangedNotice(u)(request, messagesApi.preferred(request))
                 val result = Redirect(onHandlePasswordChangeGoTo).flashing(Success -> Messages(OkMessage))
-                Events.fire(PasswordChangeEvent(request.user)).map(result.withSession).getOrElse(result)
+                for {
+                  eventSession <- Events.fire(PasswordChangeEvent(request.user))
+                } yield eventSession.fold(result)(result.withSession)
+
               case None =>
-                Redirect(onHandlePasswordChangeGoTo).flashing(Error -> Messages("securesocial.password.error"))
+                Future.successful(
+                  Redirect(onHandlePasswordChangeGoTo).flashing(Error -> Messages("securesocial.password.error"))
+                )
             }
           })
       }

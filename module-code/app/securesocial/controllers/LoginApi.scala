@@ -60,12 +60,13 @@ trait BaseLoginApi extends SecureSocialController {
               env.userService.save(authenticated.profile, mode).flatMap {
                 userForAction =>
                   logger.debug(s"[securesocial] user completed authentication: provider = ${profile.providerId}, userId: ${profile.userId}, mode = $mode")
-                  val evt = if (mode == SaveMode.LoggedIn) new LoginEvent(userForAction) else new SignUpEvent(userForAction)
+                  val evt = if (mode == SaveMode.LoggedIn) LoginEvent(userForAction) else SignUpEvent(userForAction)
                   // we're not using a session here .... review this.
-                  Events.fire(evt)
-                  builder.fromUser(userForAction).map { authenticator =>
-                    val token = TokenResponse(authenticator.id, authenticator.expirationDate)
-                    Ok(Json.toJson(token))
+                  Events.fire(evt).flatMap { _ =>
+                    builder.fromUser(userForAction).map { authenticator =>
+                      val token = TokenResponse(authenticator.id, authenticator.expirationDate)
+                      Ok(Json.toJson(token))
+                    }
                   }
               }
           }

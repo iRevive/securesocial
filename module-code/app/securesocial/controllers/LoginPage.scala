@@ -87,16 +87,15 @@ trait BaseLoginPage extends SecureSocial {
   def logout = UserAwareAction.async {
     implicit request =>
       val redirectTo = Redirect(configuration.get[Option[String]](onLogoutGoTo).getOrElse(env.routes.loginPageUrl))
-      val result = for {
-        user <- request.user
-        authenticator <- request.authenticator
-      } yield {
-        redirectTo.discardingAuthenticator(authenticator).map {
-          _.withSession(Events.fire(LogoutEvent(user)).getOrElse(request.session))
-        }
-      }
-      result.getOrElse {
-        Future.successful(redirectTo)
+      request.user.zip(request.authenticator) match {
+        case Some((user, authenticator)) =>
+          for {
+            result <- redirectTo.discardingAuthenticator(authenticator)
+            eventSession <- Events.fire(LogoutEvent(user))
+          } yield eventSession.fold(result)(result.withSession)
+
+        case None =>
+          Future.successful(redirectTo)
       }
   }
 }

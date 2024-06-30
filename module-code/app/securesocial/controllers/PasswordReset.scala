@@ -129,14 +129,12 @@ trait BasePasswordReset extends MailTokenBasedOperations with BaseController {
               env.userService.findByEmailAndProvider(t.email, UsernamePasswordProvider.UsernamePassword).flatMap {
                 case Some(profile) =>
                   val hashed = env.currentHasher.hash(p._1)
-                  for (
-                    updated <- env.userService.save(profile.copy(passwordInfo = Some(hashed)), SaveMode.PasswordChange);
+                  for {
+                    updated <- env.userService.save(profile.copy(passwordInfo = Some(hashed)), SaveMode.PasswordChange)
                     deleted <- env.userService.deleteToken(token)
-                  ) yield {
-                    env.mailer.sendPasswordChangedNotice(profile)
-                    val eventSession = Events.fire(new PasswordResetEvent(updated)).getOrElse(request.session)
-                    confirmationResult().withSession(eventSession).flashing(Success -> Messages(PasswordUpdated))
-                  }
+                    _ = env.mailer.sendPasswordChangedNotice(profile)
+                    eventSession <- Events.fire(PasswordResetEvent(updated)).map(_.getOrElse(request.session))
+                  } yield confirmationResult().withSession(eventSession).flashing(Success -> Messages(PasswordUpdated))
                 case _ =>
                   logger.error("[securesocial] could not find user with email %s during password reset".format(t.email))
                   Future.successful(confirmationResult().flashing(Error -> Messages(ErrorUpdatingPassword)))
